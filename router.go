@@ -17,7 +17,7 @@ func (router *router) InitRouter() *chi.Mux {
 	loginController := ServiceContainer().InjectLoginController()
 
 	r := chi.NewRouter()
-	r.Post("/login", loginController.LoginProcess)
+	r.Get("/login", loginController.LoginProcess)
 
 	return r
 }
