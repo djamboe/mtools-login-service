@@ -1,7 +1,10 @@
 package controllers
 
 import (
-	"fmt"
+	"encoding/json"
+	"github.com/djamboe/mtools-login-service/models"
+	"github.com/go-chi/render"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/djamboe/mtools-login-service/interfaces"
@@ -12,18 +15,24 @@ type LoginController struct {
 }
 
 func (controller *LoginController) LoginProcess(res http.ResponseWriter, req *http.Request) {
-	//user := models.UserLoginParamModel{}
-	//err := json.NewDecoder(req.Body).Decode(&user)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//userJson, err := json.Marshal(user)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//res.Header().Set("Content-Type", "application/json")
-	//res.WriteHeader(http.StatusOK)
-	//res.Write(userJson)
-	fmt.Fprintf(res, "Hello World!")
+	var user models.UserLoginParamModel
+	s, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(s, &user)
+	if err != nil {
+		panic(err)
+	}
+
+	username := user.Username
+	password := user.Password
+
+	login, err := controller.DoLogin(username, password)
+	if err != nil {
+		panic(err)
+	}
+	render.JSON(res, req, login.Username)
+
 }

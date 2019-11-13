@@ -13,7 +13,7 @@ func (service *LoginService) DoLogin(username string, password string) (models.U
 	var user models.UserModel
 	user, err := service.GetUserByEmailAndPassword(username, password)
 	if err != nil {
-		return models.UserModel{}, nil
+		panic(err)
 	}
 	return user, nil
 }

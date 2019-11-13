@@ -35,14 +35,14 @@ type LoginRepository struct {
 }
 
 func (repository *LoginRepository) GetUserByEmailAndPassword(username string, password string) (models.UserModel, error) {
-	row, err := repository.Query(fmt.Sprintf("SELECT * from user_model where username = '%s' AND password '%s'", username, password))
+	row, err := repository.Query(fmt.Sprintf("SELECT * from user_model where username = '%s' AND password = '%s' ", username, password))
 	if err != nil {
-		return models.UserModel{}, err
+		panic(err)
 	}
 
 	var user models.UserModel
 	row.Next()
-	row.Scan(&user.Id, &user.Name)
+	row.Scan(&user.Id, &user.Username)
 
 	return user, nil
 
