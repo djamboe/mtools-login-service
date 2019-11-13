@@ -5,5 +5,5 @@ import (
 )
 
 type ILoginRepository interface {
-	GetUserByEmailAndPassword(email string, password string) (models.UserModel, error)
+	GetUserByEmailAndPassword(username string, password string) (models.UserModel, error)
 }

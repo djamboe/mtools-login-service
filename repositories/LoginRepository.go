@@ -12,7 +12,7 @@ type LoginRepositoryWithCircuitBreaker struct {
 	LoginRepository interfaces.ILoginRepository
 }
 
-func (repository *LoginRepositoryWithCircuitBreaker) DoLogin(username string, password string) (models.UserModel, error) {
+func (repository *LoginRepositoryWithCircuitBreaker) GetUserByEmailAndPassword(username string, password string) (models.UserModel, error) {
 	output := make(chan models.UserModel, 1)
 	hystrix.ConfigureCommand("get_user_by_username_and_password", hystrix.CommandConfig{Timeout: 1000})
 	errors := hystrix.Go("get_user_by_username_and_password", func() error {
@@ -34,8 +34,8 @@ type LoginRepository struct {
 	interfaces.IDbHandler
 }
 
-func (repository *LoginRepository) DoLogin(username string, password string) (models.UserModel, error) {
-	row, err := repository.Query(fmt.Sprintf("SELECT * FROM user_model WHERE username = '%s' AND password = '%s'", username, password))
+func (repository *LoginRepository) GetUserByEmailAndPassword(username string, password string) (models.UserModel, error) {
+	row, err := repository.Query(fmt.Sprintf("SELECT * from user_model where username = '%s' AND password '%s'", username, password))
 	if err != nil {
 		return models.UserModel{}, err
 	}
@@ -43,5 +43,7 @@ func (repository *LoginRepository) DoLogin(username string, password string) (mo
 	var user models.UserModel
 	row.Next()
 	row.Scan(&user.Id, &user.Name)
+
 	return user, nil
+
 }
