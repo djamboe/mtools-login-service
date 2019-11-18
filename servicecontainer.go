@@ -16,11 +16,15 @@ type IserviceContainer interface {
 type kernel struct{}
 
 func (k *kernel) InjectLoginController() controllers.LoginController {
-	sqlConn, _ := sql.Open("sqlite3", "user.db")
-	sqliteHandler := &infrastructures.SQLiteHandler{}
-	sqliteHandler.Conn = sqlConn
+	mysqlConn, _ := sql.Open("mysql", "root:@tcp(localhost:3306)/marketing-tools?charset=utf8")
+	mysqlHandler := &infrastructures.DBHandler{}
+	mysqlHandler.Conn = mysqlConn
 
-	loginRepository := &repositories.LoginRepository{sqliteHandler}
+	//sqlConn, _ := sql.Open("sqlite3", "user.db")
+	//sqliteHandler := &infrastructures.SQLiteHandler{}
+	//sqliteHandler.Conn = sqlConn
+
+	loginRepository := &repositories.LoginRepository{mysqlHandler}
 	loginService := &services.LoginService{&repositories.LoginRepositoryWithCircuitBreaker{loginRepository}}
 	loginController := controllers.LoginController{loginService}
 

@@ -5,7 +5,7 @@ import (
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/djamboe/mtools-login-service/interfaces"
 	"github.com/djamboe/mtools-login-service/models"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type LoginRepositoryWithCircuitBreaker struct {
@@ -35,7 +35,7 @@ type LoginRepository struct {
 }
 
 func (repository *LoginRepository) GetUserByEmailAndPassword(username string, password string) (models.UserModel, error) {
-	row, err := repository.Query(fmt.Sprintf("SELECT * from user_model where username = '%s' AND password = '%s' ", username, password))
+	row, err := repository.Query(fmt.Sprintf("SELECT * from user where username = '%s' AND password = '%s' ", username, password))
 	if err != nil {
 		panic(err)
 	}

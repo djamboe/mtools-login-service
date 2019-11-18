@@ -6,31 +6,31 @@ import (
 	"github.com/djamboe/mtools-login-service/interfaces"
 )
 
-type SQLiteHandler struct {
+type DBHandler struct {
 	Conn *sql.DB
 }
 
-func (handler *SQLiteHandler) Execute(statement string) {
+func (handler *DBHandler) Execute(statement string) {
 	handler.Conn.Exec(statement)
 }
 
-func (handler *SQLiteHandler) Query(statement string) (interfaces.IRow, error) {
+func (handler *DBHandler) Query(statement string) (interfaces.IRow, error) {
 	rows, err := handler.Conn.Query(statement)
 
 	if err != nil {
 		fmt.Println(err)
-		return new(SqliteRow), err
+		return new(DatabaseRow), err
 	}
-	row := new(SqliteRow)
+	row := new(DatabaseRow)
 	row.Rows = rows
 	return row, nil
 }
 
-type SqliteRow struct {
+type DatabaseRow struct {
 	Rows *sql.Rows
 }
 
-func (r SqliteRow) Scan(dest ...interface{}) error {
+func (r DatabaseRow) Scan(dest ...interface{}) error {
 	err := r.Rows.Scan(dest...)
 	if err != nil {
 		return err
@@ -38,6 +38,6 @@ func (r SqliteRow) Scan(dest ...interface{}) error {
 	return nil
 }
 
-func (r SqliteRow) Next() bool {
+func (r DatabaseRow) Next() bool {
 	return r.Rows.Next()
 }
