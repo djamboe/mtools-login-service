@@ -42,7 +42,7 @@ func (repository *LoginRepository) GetUserByEmailAndPassword(username string, pa
 
 	var user models.UserModel
 	row.Next()
-	row.Scan(&user.Id, &user.Username)
+	row.Scan(&user.Id, &user.Username, &user.Password)
 
 	return user, nil
 

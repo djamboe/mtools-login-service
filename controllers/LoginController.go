@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/djamboe/mtools-login-service/models"
+	"github.com/djamboe/mtools-login-service/viewmodels"
 	"github.com/go-chi/render"
 	"io/ioutil"
 	"net/http"
@@ -16,6 +17,8 @@ type LoginController struct {
 
 func (controller *LoginController) LoginProcess(res http.ResponseWriter, req *http.Request) {
 	var user models.UserLoginParamModel
+	var response viewmodels.LoginVM
+
 	s, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		panic(err)
@@ -33,6 +36,17 @@ func (controller *LoginController) LoginProcess(res http.ResponseWriter, req *ht
 	if err != nil {
 		panic(err)
 	}
-	render.JSON(res, req, login.Username)
+
+	if login.Id != 0 {
+		response.Error = false
+		response.Id = login.Id
+		response.Username = login.Username
+	}else{
+		response.Error = true
+		response.Id = login.Id
+		response.Username = login.Username
+	}
+
+	render.JSON(res, req,response)
 
 }
