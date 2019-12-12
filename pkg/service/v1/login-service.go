@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -44,7 +45,7 @@ func (s *loginServiceServer) Login(ctx context.Context, req *v1.LoginRequest) (*
 	if err := s.checkAPI(req.Api); err != nil {
 		return nil, err
 	}
-
+	fmt.Println(req.Username)
 	loginController := ServiceContainer().InjectLoginController()
 	response, err := loginController.LoginProcess(req.Username, req.Password)
 

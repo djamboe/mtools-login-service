@@ -6,6 +6,7 @@ import (
 	"github.com/djamboe/mtools-login-service/interfaces"
 	"github.com/djamboe/mtools-login-service/models"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type LoginRepositoryWithCircuitBreaker struct {
@@ -31,19 +32,27 @@ func (repository *LoginRepositoryWithCircuitBreaker) GetUserByEmailAndPassword(u
 }
 
 type LoginRepository struct {
-	interfaces.IDbHandler
+	//interfaces.IDbHandler
+	interfaces.IMongoDBHandler
+}
+
+type Hero struct {
+	Username string `json:"username"`
 }
 
 func (repository *LoginRepository) GetUserByEmailAndPassword(username string, password string) (models.UserModel, error) {
-	row, err := repository.Query(fmt.Sprintf("SELECT * from user where username = '%s' AND password = '%s' ", username, password))
-	if err != nil {
+	filter := bson.M{"userName": username, "password": password}
+	row, err := repository.FindOne(filter, "users", "maroon_martools")
+	if row == nil {
 		panic(err)
 	}
 
 	var user models.UserModel
-	row.Next()
-	row.Scan(&user.Id, &user.Username, &user.Password)
-
+	var hero Hero
+	//heroType := reflect.TypeOf(hero)
+	row.DecodeResults(&hero)
+	fmt.Println("from interface", hero)
+	user.Username = hero.Username
+	user.Id = 1
 	return user, nil
-
 }
