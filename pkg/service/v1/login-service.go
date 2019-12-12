@@ -2,8 +2,6 @@ package v1
 
 import (
 	"context"
-	"fmt"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -42,20 +40,39 @@ func (s *loginServiceServer) checkAPI(api string) error {
 // Create new todo task
 func (s *loginServiceServer) Login(ctx context.Context, req *v1.LoginRequest) (*v1.LoginResponse, error) {
 	// check if the API version requested by client is supported by server
+	message := "Successfully login !"
+	var userData v1.User
+	errorStatus := false
 	if err := s.checkAPI(req.Api); err != nil {
-		return nil, err
+		message = "Unsupported api version !"
+		errorStatus = true
 	}
-	fmt.Println(req.Username)
 	loginController := ServiceContainer().InjectLoginController()
 	response, err := loginController.LoginProcess(req.Username, req.Password)
 
 	if err != nil {
-		panic(err)
+		message = "Login failed, an error occured"
+		errorStatus = true
 	}
+
+	if response.Id == 0 {
+		message = "Invalid credentials !"
+		errorStatus = true
+	}
+
+	userData.Id = response.Id
+	userData.DbId = response.DbId
+	userData.Level = response.Level
+	userData.MemberId = response.MemberId
+	userData.Parent = response.Parent
+	userData.UserName = response.Username
+	userData.UserEmail = response.UserEmail
+	userData.Status = response.Status
+
 	return &v1.LoginResponse{
 		Api:     apiVersion,
-		Message: response.Username,
-		Error:   false,
-		User:    nil,
+		Message: message,
+		Error:   errorStatus,
+		User:    &userData,
 	}, nil
 }

@@ -5,10 +5,11 @@ message User{
     int64 id = 1;
     string userName = 2;
     string userEmail = 3;
-    string level = 4;
+    int32 level = 4;
     int32 parent = 5;
     int32 status = 6;
     int64 memberId = 7;
+    string dbId = 8;
 }
 
 message LoginRequest{

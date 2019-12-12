@@ -1,11 +1,12 @@
 package models
 
 type UserModel struct {
-	Id        int    `json:"id"`
-	_Id       string `json:"_id"`
+	Id        int64  `json:"id"`
+	DbId      string `json:"_id"`
 	Username  string `json:"userName"`
 	UserEmail string `json:"userEmail"`
-	Level     int    `json:"level"`
-	Parent    int    `json:"parent"`
-	Status    int    `json:"status"`
+	Level     int32  `json:"level"`
+	Parent    int32  `json:"parent"`
+	Status    int32  `json:"status"`
+	MemberId  int64  `json:"memberId"`
 }

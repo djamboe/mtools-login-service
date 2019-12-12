@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"fmt"
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/djamboe/mtools-login-service/interfaces"
 	"github.com/djamboe/mtools-login-service/models"
@@ -36,23 +35,19 @@ type LoginRepository struct {
 	interfaces.IMongoDBHandler
 }
 
-type Hero struct {
-	Username string `json:"username"`
-}
-
 func (repository *LoginRepository) GetUserByEmailAndPassword(username string, password string) (models.UserModel, error) {
 	filter := bson.M{"userName": username, "password": password}
 	row, err := repository.FindOne(filter, "users", "maroon_martools")
-	if row == nil {
+
+	if err != nil {
 		panic(err)
 	}
 
+	if row == nil {
+		return models.UserModel{}, nil
+	}
+
 	var user models.UserModel
-	var hero Hero
-	//heroType := reflect.TypeOf(hero)
-	row.DecodeResults(&hero)
-	fmt.Println("from interface", hero)
-	user.Username = hero.Username
-	user.Id = 1
+	row.DecodeResults(&user)
 	return user, nil
 }
