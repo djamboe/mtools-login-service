@@ -2,9 +2,11 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	v1 "github.com/djamboe/mtools-login-service/pkg/api/v1"
 )
 
@@ -41,7 +43,6 @@ func (s *loginServiceServer) checkAPI(api string) error {
 func (s *loginServiceServer) Login(ctx context.Context, req *v1.LoginRequest) (*v1.LoginResponse, error) {
 	// check if the API version requested by client is supported by server
 	message := "Successfully login !"
-	var userData v1.User
 	errorStatus := false
 	if err := s.checkAPI(req.Api); err != nil {
 		message = "Unsupported api version !"
@@ -55,24 +56,30 @@ func (s *loginServiceServer) Login(ctx context.Context, req *v1.LoginRequest) (*
 		errorStatus = true
 	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"uId":   response.Id,
+		"uDbId": response.DbId,
+		"uLvl":  response.Level,
+		"uMid":  response.MemberId,
+		"uP":    response.Parent,
+		"uE":    response.UserEmail,
+		"uS":    response.Status,
+	})
+	tokenString, err := token.SignedString([]byte("1A-kYaSQJISPt6zI5ZvBD1g9cNy9SqBr0WTmbZuzUHLpfNt28r0rSxImBwO1rjl_TQp44pafqJ9Y4GQzogiZM8qH6vBByu5_AMtLs0AOcaq2jU0vwkJ6OgrnrWkaJQ1cyQAmjp4Kr5ZfOO_riN8xbdO2C8BT15Ks4OOL_4SBdRT8fEYiHnIutZ29oG17Q0pCN53MTII7Dv-eM5QzrrVojmvrAJK3KoC4bi6Uh_7P6t892c4IWiZnzOpKdK7ZhgW2fQFTurHlrmAgU8WYOE8Eui0FU5WVZtHRBrcbRCGxIbjKeonCbJfJ8BDwaI0WsfTjYclEetAoKTNUZ8sG_mspyQ"))
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	if response.Id == 0 {
 		message = "Invalid credentials !"
 		errorStatus = true
+		tokenString = ""
 	}
-
-	userData.Id = response.Id
-	userData.DbId = response.DbId
-	userData.Level = response.Level
-	userData.MemberId = response.MemberId
-	userData.Parent = response.Parent
-	userData.UserName = response.Username
-	userData.UserEmail = response.UserEmail
-	userData.Status = response.Status
-
 	return &v1.LoginResponse{
 		Api:     apiVersion,
 		Message: message,
 		Error:   errorStatus,
-		User:    &userData,
+		Token:   tokenString,
 	}, nil
 }

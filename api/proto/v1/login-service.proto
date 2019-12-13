@@ -23,7 +23,6 @@ message LoginResponse{
     string message = 2;
     bool error = 3;
     string token = 4;
-    User user = 5;
 }
 
 service LoginService{
